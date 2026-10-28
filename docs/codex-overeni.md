@@ -68,4 +68,21 @@ prostředí byl tento zápis odmítnut. Pro instalaci balíčků byl potřeba po
 
 Technické testy neprokazují správnost přepisu historického písma. Windows, nová relace Claude Code,
 přihlášení a nasazení na Netlify ani všechny živé archivní portály nejsou tímto ověřením pokryté.
-ImageMagick nebyl v testovacím prostředí dostupný; práci s výřezy je třeba ověřit po jeho instalaci.
+Při prvním ověření nebyl dostupný ImageMagick; dodatečný test po instalaci je popsaný níže.
+
+## Dodatečné ověření instalace a obrázků
+
+Dne 28. 10. 2026 byl přes Homebrew nainstalován ImageMagick 7.1.2-29 a skill 0.5.1
+z commitu `276505ecb49bc212df05b48c96e7377b99b81138` do uživatelské složky `~/.agents/skills/rodokmen/`.
+Obsah instalovaných souborů odpovídá ověřené verzi (porovnání SHA-256). Skutečný Codex app-server
+potvrdil jediný skill `rodokmen` s `scope=user` a `enabled=true`.
+
+V dočasném ukázkovém projektu vytvořeném nainstalovaným skillem prošly:
+
+- `vyrez.py`: výřez syntetického obrázku 4000 × 2400 na 3200 × 1200 a zmenšení na 1800 × 675;
+- `ramecek.py`: zápis souřadnic do `data/zvyrazneni.json` a vytvoření kontrolního obrázku;
+  červený rámeček byl také vizuálně zkontrolován;
+- `overit.py`: vytvoření dvou kontrolních částí, každé o šířce 1900 pixelů;
+- kontrola, že původní obrázek má po zpracování stejný SHA-256.
+
+Šlo o syntetický obrazový test, nikoli ověření přepisu skutečné matriky.
