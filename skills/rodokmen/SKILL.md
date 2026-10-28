@@ -1,6 +1,9 @@
 ---
 name: rodokmen
-description: Průvodce tvorbou rodokmenu z českých matrik a rodinného webu pro lidi bez zkušeností s genealogií i programováním. Použij, když chce uživatel začít nebo pokračovat v rodokmenu, hledat předky v matrikách (ARON, archivy), číst a přepisovat matriční zápisy, psát zajímavosti a příběh rodu nebo postavit a zveřejnit rodinný web s vějířem předků, mapou a zápisy. Spouštěcí fráze: „rodokmen“, „předci“, „matriky“, „chci zjistit, odkud pochází moje rodina“.
+description: >-
+  Průvodce tvorbou rodokmenu z českých matrik a rodinného webu. Použij při hledání předků,
+  čtení a přepisu matričních zápisů, práci s rodinnými údaji a příběhy nebo tvorbě rodinného webu.
+  Určeno i lidem bez zkušeností s genealogií a programováním.
 ---
 
 # Rodokmen z matrik + rodinný web
@@ -9,7 +12,11 @@ Vedeš člověka, který **nikdy nedělal genealogii ani neprogramoval**, od rod
 až k hezkému rodinnému webu. Ty děláš technickou práci (stahování snímků, čtení, zápis dat, web);
 uživatel dodává znalost rodiny, rozhoduje sporná místa a schvaluje, co jde ven.
 
-**Složka tohoto skillu** (dále `SKILL_DIR`) je ta, kterou ti systém ukázal při načtení skillu („Base directory“).
+**Složka tohoto skillu** (dále `SKILL_DIR`) je adresář obsahující právě načtený `SKILL.md`.
+Odvoď ji z cesty, kterou poskytlo prostředí; nepředpokládej instalaci v `~/.claude/` ani `~/.agents/`.
+`SKILL_DIR` v příkladech je zástupný text, ne automaticky nastavená proměnná: nahraď ho skutečnou absolutní cestou
+a celou cestu ke skriptu i cílovou složku uzavři do uvozovek, pokud obsahují mezery. Příkazy `tools/…` spouštěj
+až v založeném projektu; před založením používej nástroje ze složky skillu.
 Najdeš v ní `tools/` (nástroje), `template/` (šablona projektu a webu) a `reference/` (podrobné návody – čti je, až je potřebuješ).
 
 ## Jak mluvit s uživatelem
@@ -30,7 +37,9 @@ Najdeš v ní `tools/` (nástroje), `template/` (šablona projektu a webu) a `re
    **Verze:** porovnej soubor `.skill_verze` v projektu se `SKILL_DIR/VERZE`. Chybí-li, nebo se liší, řekni jednou větou,
    že je nová verze skillu, a nabídni aktualizaci projektu: `python3 -I SKILL_DIR/tools/novy_projekt.py <složka projektu>`
    (data zůstanou, změněné soubory webu se zazálohují do `pracovni/`), pak ve `web/` `npm install`. Po souhlasu ji udělej
-   a podle výpisu převezmi ze zálohy případné úpravy vzhledu (viz `reference/web.md`). Odmítne-li, připomeň to až příště.
+   a podle výpisu převezmi ze zálohy případné úpravy vzhledu (viz `reference/web.md`). Při přechodu staršího projektu
+   na Codex přečti původní `CLAUDE.md` a přenes jeho relevantní místní nastavení do `AGENTS.md` bez přepsání
+   existujících pravidel. Odmítne-li aktualizaci, připomeň ji až příště.
 2. Projekt ještě není → **Fáze 0**.
 
 ## Fáze 0 – Příprava (jednou)
@@ -41,27 +50,28 @@ Najdeš v ní `tools/` (nástroje), `template/` (šablona projektu a webu) a `re
    ke zdroji msstore („Error reading input in prompt“): `winget install --id <balík> --source winget
    --accept-source-agreements --accept-package-agreements` (balíky `Python.Python.3.12` + `--scope user`,
    `OpenJS.NodeJS.LTS`, `ImageMagick.ImageMagick`, `Git.Git`). Instalace systémových věcí nech uživatele potvrdit;
-   interaktivní příkazy mu dej s předponou `!`, ať je spustí sám.
+   interaktivní příkazy mu dej jako běžné příkazy do terminálu. Předponu `!` používej jen tam, kde ji klient podporuje.
    **Windows:** `python3` tam bývá jen nefunkční alias z Microsoft Store („Python nebyl nalezen“) – zkontroluj
    `python --version` (případně `py -3 --version`) a ve všech příkazech tohoto skillu místo `python3 -I` používej
    `python -I -X utf8` (funguje-li jen launcher, tak `py -3 -I -X utf8`). Zkontroluj **který** Python to je
    (`which -a python`) – může být přibalený k jinému programu (Inkscape, GIMP…) a nemít certifikáty. Ověř https:
    `python -I -c "import urllib.request; urllib.request.urlopen('https://aron.vychodoceskearchivy.cz')"`. Když spadne
    na `CERTIFICATE_VERIFY_FAILED`, nainstaluj běžný Python (winget výše) a volej ho plnou cestou
-   `"$LOCALAPPDATA/Programs/Python/Python312/python.exe"` (do PATH se dostane až po restartu Claude Code). `-I` ignoruje proměnnou `PYTHONUTF8`;
+   `"$LOCALAPPDATA/Programs/Python/Python312/python.exe"` (do PATH se dostane až po restartu aplikace nebo terminálu). `-I` ignoruje proměnnou `PYTHONUTF8`;
    bez `-X utf8` je výstup do roury nebo souboru v kódování Windows (cp1250) – čeština se rozbije a některé nástroje
    spadnou na znacích jako „→“. ImageMagick: `winget install --id ImageMagick.ImageMagick --source winget --accept-source-agreements --accept-package-agreements`; do PATH se dostane až po
-   restartu Claude Code (do té doby před příkazy `export PATH="/c/Program Files/ImageMagick-7…:$PATH"` s přesnou složkou
+   restartu aplikace nebo terminálu (do té doby před příkazy `export PATH="/c/Program Files/ImageMagick-7…:$PATH"` s přesnou složkou
    z `C:\Program Files`). **Nikdy `convert`** (to je systémový nástroj Windows), vždy `magick`. Skripty `.sh` spouštěj
    přes Git Bash (`bash tools/…`). Delší jednorázové skripty v Pythonu nepiš jako heredoc (`python - <<EOF`), v Git Bash
-   občas spadnou na „unexpected EOF“ – zapiš je do souboru v `pracovni/` a spusť. Tato pravidla zapiš hned po založení projektu do jeho `CLAUDE.md`, ať platí i příště
+   občas spadnou na „unexpected EOF“ – zapiš je do souboru v `pracovni/` a spusť. Tato pravidla zapiš hned po založení projektu do jeho `AGENTS.md`, ať platí i příště
    (a dej je do zadání i pomocníkům, viz `reference/matriky.md`).
 2. Zeptej se, kde má projekt být (navrhni `~/Rodokmen`), a založ ho:
    `python3 -I SKILL_DIR/tools/novy_projekt.py <složka>`
    Chce-li uživatel nejdřív vidět, jak web vypadá, založ vedle ukázku: `… novy_projekt.py ~/Rodokmen-ukazka --ukazka`,
    pak `cd web && npm install && npm run nahled` a pošli mu odkaz http://localhost:4321.
-3. V projektu `git init` a první uložení (git = historie změn, kdyby se něco pokazilo). Doporuč pokračovat v Claude Code
-   **z této složky** (soubor `CLAUDE.md` v ní zajistí, že příště navážeš).
+3. V projektu `git init` a první uložení (git = historie změn, kdyby se něco pokazilo). Doporuč pokračovat v Codexu nebo Claude Code
+   **z této složky**. Codex načte `AGENTS.md`; Claude Code načte `CLAUDE.md`, který u nových projektů odkazuje
+   na stejné instrukce. V novém sezení vždy ověř stav v `data/STAV.md`.
 4. Vyplň v `data/STAV.md` sekci „Pro koho“ a v `data/web.json` název webu („Rodokmen Novákových“),
    jakmile znáš příjmení výchozí osoby (šablona je prázdná).
 
@@ -154,11 +164,11 @@ Každému dej přesné zadání (svazek, snímky, koho hledat, formát výsledku
 a pravidla výše. Pomocník píše jen do `pracovni/pom_<větev>/`, **do `data/` nikdy**. Zapisuješ ty.
 Ať zmíní i zjevně související výskyty (viz krok 6 výše). Výstupy pomocníků v `pracovni/` nemaž, dokud nejsou vytěžené.
 **Jejich čtení vždy ověř sám na snímku** (`python3 -I tools/overit.py <snímek> x0,y0,x1,y1 pracovni/over`, souřadnice jako zlomky 0–1 šířky a výšky, ne pixely, rozdělí zápis
-na dvě čitelné poloviny), než ho zapíšeš jako `doc`. Uživateli to vysvětli správně: pomocníci nečtou hůř, je to stejný
-model. Jde o princip čtyř očí a pomocník nemá kontext (dvě rodiny stejného jména ve vsi, dva Janové na statku).
+na dvě čitelné poloviny), než ho zapíšeš jako `doc`. Uživateli neslibuj stejnou kvalitu čtení ani stejný model. Jde o druhou kontrolu a pomocník nemá celý kontext (dvě rodiny stejného jména ve vsi, dva Janové na statku).
 Prohlížeč může mít najednou jen jeden pomocník, proto dávej přednost nástrojům bez prohlížeče.
-**Pomocníky spouštěj na levnějším modelu** (Agent s `model: "sonnet"`): hledání a první čtení zvládnou a stojí zlomek
-kreditů. Ověření na snímku a zápis do dat dělá hlavní model (ty). Uživateli to řekni, ať ví, proč kredity tolik neubývají.
+**Používej nástroj pro pomocné agenty dostupný v daném prostředí.** Názvy modelů ani parametry nepřenášej
+mezi klienty. Pokud lze model vybrat, řiď se dostupnou nabídkou a náročností čtení; cenu ani úsporu neodhaduj bez podkladů.
+Ověření na snímku a zápis do dat dělá hlavní agent (ty). Pokud pomocníci nejsou dostupní, proveď stejné kroky postupně sám.
 Osvědčilo se 3–4 pomocníci na různé větve a archivy současně, jedno kolo ≈ 15–25 nových předků.
 Pomocníci stojí hodně kreditů – před velkým kolem řekni uživateli, co plánuješ a proč, a nech si to schválit.
 Do zadání jim napiš technické pasti z `reference/matriky.md` (macOS: zsh; Windows: `python -I -X utf8`, `magick`).
@@ -183,7 +193,8 @@ Podrobně `reference/pribehy.md`. Tohle je to, co rodina na webu čte nejradši,
 ## Fáze 4 – Web
 Podrobně `reference/web.md`. Ve zkratce:
 1. `cd web && npm install` (jednou), pak `npm run nahled` → http://localhost:4321 – ukaž uživateli. V cloudovém prostředí
-   (claude.ai) localhost neuvidí – pošli mu snímky stránek (headless prohlížeč) nebo nasaď náhled.
+   nemusí být localhost uživateli přístupný – použij podporovaný náhled prostředí nebo snímky stránek.
+   Vzdálený náhled zveřejni jen po výslovném souhlasu, stejně jako finální web.
 2. Nastav `data/web.json`: název, úvod, kontakt a **přihlašovací otázku a odpověď** (web je jen pro rodinu).
 3. Po každé změně dat: `npm run data && npm run build` (nebo znovu `npm run nahled`). Hlášky `POZOR: nefunkční odkaz`
    oprav hned (adresa osoby se mění, když se jí doplní rok narození).
@@ -195,7 +206,7 @@ Podrobně `reference/web.md`. Ve zkratce:
 
 ## Fáze 5 – Zveřejnění (volitelné, jen se souhlasem)
 Výchozí cesta je **Netlify** (zdarma): `npm run nasadit`. Přihlášení k Netlify a první propojení webu jsou interaktivní –
-dej je uživateli jako `! npx netlify-cli login` atd. (postup v `reference/web.md`). Pokročilá varianta: vlastní server (Docker/CapRover).
+dej je uživateli jako příkazy do terminálu (`npx netlify-cli login` atd.) (postup v `reference/web.md`). Pokročilá varianta: vlastní server (Docker/CapRover).
 Nic nezveřejňuj bez výslovného souhlasu uživatele.
 
 ## Poznámky pro správce skillu

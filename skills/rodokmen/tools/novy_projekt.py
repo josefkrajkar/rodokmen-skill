@@ -5,9 +5,9 @@ Použití: python3 <skill>/tools/novy_projekt.py <cílová složka> [--ukazka]
   --ukazka   nakopíruje i vymyšlená ukázková data (rodina Novákových), aby šel web hned vyzkoušet
 
 Vytvoří: data/ (prázdné kostry nebo ukázka), web/ (Astro web), tools/ (kopie nástrojů),
-vyrezy/, zdroje/, dokumenty/, pracovni/, CLAUDE.md, .gitignore, .gitattributes (konce řádků LF i na Windows)
+vyrezy/, zdroje/, dokumenty/, pracovni/, AGENTS.md, CLAUDE.md, .gitignore, .gitattributes (konce řádků LF i na Windows)
 a .claude/launch.json (náhled v Claude desktop).
-Existující data nepřepisuje.
+Existující data ani projektové instrukce nepřepisuje. Chybějící AGENTS.md doplní i do staršího projektu.
 Aktualizace staršího projektu (znovu spustit na stejnou složku): tools/ se přepíše vždy a soubory webu,
 které se liší od nové šablony, taky – jejich staré verze se nejdřív uloží do pracovni/zaloha_web_<datum>/.
 """
@@ -74,10 +74,12 @@ def main():
     for d in ("vyrezy", "zdroje", "dokumenty", "pracovni"):
         os.makedirs(os.path.join(dst, d), exist_ok=True)
     os.makedirs(os.path.join(dst, ".claude"), exist_ok=True)
-    for name in ("CLAUDE.md", ".gitignore", ".gitattributes", "poznamky_pro_skill.md", os.path.join(".claude", "launch.json")):
+    for name in ("AGENTS.md", "CLAUDE.md", ".gitignore", ".gitattributes", "poznamky_pro_skill.md", os.path.join(".claude", "launch.json")):
         out = os.path.join(dst, name)
         if not os.path.lexists(out):
             copy(os.path.join(SKILL, "template", name), out)
+            if name in ("AGENTS.md", "CLAUDE.md"):
+                print("Doplněny projektové instrukce:", name)
     with open(os.path.join(dst, ".skill_verze"), "w", encoding="utf-8") as f:   # SKILL.md podle něj nabídne aktualizaci
         f.write(open(os.path.join(SKILL, "VERZE"), encoding="utf-8").read())
     print("Projekt připraven:", dst)

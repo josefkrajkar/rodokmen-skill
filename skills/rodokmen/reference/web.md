@@ -46,14 +46,14 @@ Náhled spouštěj na pozadí a uživateli pošli odkaz. Vzhled si ověř sám (
 
 ## Zveřejnění na Netlify (výchozí, zdarma)
 1. Uživatel si založí účet na netlify.com (stačí přihlášení přes Google/GitHub) – udělá sám.
-2. Přihlášení CLI (otevře prohlížeč) – dej uživateli: `! cd web && npx -y netlify-cli@latest login`.
-   Když `!` nejde (cloudové prostředí): `npx -y netlify-cli@latest login --request "Rodokmen"` vypíše odkaz a číslo
+2. Přihlášení CLI (otevře prohlížeč) – dej uživateli do terminálu: `cd web && npx -y netlify-cli@latest login`.
+   Pokud přihlášení nemůže otevřít místní prohlížeč (např. vzdálené prostředí): `npx -y netlify-cli@latest login --request "Rodokmen"` vypíše odkaz a číslo
    lístku – uživatel odkaz otevře a schválí, pak `npx -y netlify-cli@latest login --check <lístek>`.
 3. Založení webu a propojení složky (interaktivní, jednou) – dej uživateli:
-   `! cd web && npx -y netlify-cli@latest sites:create` (zvolí tým a název → adresa `https://<název>.netlify.app`),
+   `cd web && npx -y netlify-cli@latest sites:create` (zvolí tým a název → adresa `https://<název>.netlify.app`),
    případně `npx netlify-cli link`, pokud web už existuje. Je-li uživatel už přihlášený, jde web založit i bez dotazů
    (můžeš spustit sám): `cd web && npx -y netlify-cli@latest sites:create --name <název> --account-slug <tým>`.
-   **Windows:** když `!` běží ve Windows PowerShellu 5.1 (`&&` tam nefunguje a `npx` blokuje Execution Policy), ať uživatel
+   **Windows:** při použití Windows PowerShellu 5.1 (`&&` tam nefunguje a `npx` blokuje Execution Policy), ať uživatel
    otevře PowerShell 7 nebo Příkazový řádek, přejde do složky `web` a spustí `npx -y netlify-cli@latest login` (a `sites:create`).
 4. Nasazení: `cd web && npm run nasadit` (můžeš spustit sám; vypíše adresu webu).
 5. Ověř: otevři adresu **v anonymním okně** → musí se ukázat rodinná přihlašovací otázka; po správné odpovědi web.
@@ -64,6 +64,13 @@ Náhled spouštěj na pozadí a uživateli pošli odkaz. Vzhled si ověř sám (
 Další aktualizace = jen `npm run nasadit`. Vlastní doménu lze nastavit v administraci Netlify.
 
 **Pozor:** „Netlify Drop“ (přetažení složky v prohlížeči) neumí Edge Functions → web by byl bez přihlášení. Nepoužívat.
+
+## Náhled v Codexu
+Ve složce projektu spusť `npm --prefix web run nahled` a otevři http://localhost:4321
+v prohlížeči nebo v náhledu aplikace, pokud ho klient nabízí. Příkaz exportuje data, sestaví web
+a spustí místní server; ukončíš ho Ctrl+C. Konfigurace `.claude/launch.json` se zde nepoužívá.
+Pro úpravy vzhledu lze po `npm --prefix web run data` použít `npm --prefix web run dev`.
+Server nech přístupný jen na tomto počítači – nepřidávej `--host`.
 
 ## Náhled v Claude desktop
 Projekt má `.claude/launch.json` – náhled webu v Claude desktop spustí `npm --prefix web run dev` (port 4321). Data se
@@ -88,3 +95,7 @@ Znovu spusť `python3 -I SKILL_DIR/tools/novy_projekt.py <složka projektu>`. Da
 a soubory ve `web/`, které se liší od nové šablony, taky – staré verze uloží do `pracovni/zaloha_web_<datum>/` a vypíše jejich seznam.
 Upravoval-li jsi s uživatelem vzhled (styly, stránky), převezmi úpravy ze zálohy (porovnej soubory) a ověř web. Pak ve `web/`
 `npm install` a `npm run data`. Starou šablonu přihlášení `export_web.py` odmítne s výzvou k aktualizaci.
+
+Chybějící `AGENTS.md` se doplní i starším projektům. Existující `AGENTS.md`, `CLAUDE.md`
+a `.claude/launch.json` se zachovají. Při prvním přechodu na Codex projdi původní `CLAUDE.md`
+a přenes relevantní vlastní pravidla do `AGENTS.md`; generátor je automaticky neslučuje.
